@@ -64,8 +64,21 @@ bool CanonEOSR::_connect(void) {
   return true;
 }
 
+void CanonEOSR::setMode(CameraMode mode)
+{
+  Camera::setMode(mode);
+  switch (mode) {
+    case Camera::CameraMode::PHOTO:
+      CTRL = PHOTO;
+      break;
+    case Camera::CameraMode::MOVIE:
+      CTRL = MOVIE;
+      break;
+  }
+}
+
 void CanonEOSR::shutterPress(void) {
-  const std::array<uint8_t, 1> cmd = {SHUTTER | CTRL};
+  const std::array<uint8_t, 1> cmd = {static_cast<uint8_t>(SHUTTER | CTRL)};
   pControl->writeValue(cmd.data(), cmd.size(), true);
   return;
 }
@@ -77,7 +90,7 @@ void CanonEOSR::shutterRelease(void) {
 }
 
 void CanonEOSR::focusPress(void) {
-  const std::array<uint8_t, 1> cmd = {FOCUS | CTRL};
+  const std::array<uint8_t, 1> cmd = {static_cast<uint8_t>(FOCUS | CTRL)};
   pControl->writeValue(cmd.data(), cmd.size(), true);
   return;
 }

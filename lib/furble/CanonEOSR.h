@@ -22,6 +22,7 @@ class CanonEOSR: public CanonEOS {
   void focusPress(void) override final;
   void focusRelease(void) override final;
   void updateGeoData(const gps_t &gps, const timesync_t &timesync) override final;
+  void setMode(CameraMode mode) override final;
 
  private:
   // Primary service
@@ -35,7 +36,10 @@ class CanonEOSR: public CanonEOS {
 
   static constexpr uint8_t SHUTTER = 0x80;
   static constexpr uint8_t FOCUS = 0x40;
-  static constexpr uint8_t CTRL = 0x0c;
+  uint8_t CTRL = 0x0c;
+  static constexpr uint8_t PHOTO = 0x0c;
+  static constexpr uint8_t DELAY = 0x04;
+  static constexpr uint8_t MOVIE = 0x08;
 
   NimBLERemoteCharacteristic *pControl = nullptr;
 
