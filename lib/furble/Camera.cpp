@@ -4,7 +4,7 @@
 
 namespace Furble {
 
-Camera::Camera(Type type, PairType pairType) : m_PairType(pairType), m_Type(type) {
+Camera::Camera(Type type, PairType pairType) : m_PairType(pairType), m_Mode(Camera::CameraMode::PHOTO), m_Type(type) {
   m_Client = NimBLEDevice::createClient();
 }
 
@@ -38,6 +38,16 @@ void Camera::disconnect(void) {
   m_Active = false;
   m_Progress = 0;
   this->_disconnect();
+}
+
+void Camera::setMode(CameraMode mode)
+{
+  m_Mode = mode;
+}
+
+Camera::CameraMode Camera::getMode(void) const
+{
+  return m_Mode;
 }
 
 bool Camera::isActive(void) const {

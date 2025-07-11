@@ -38,6 +38,14 @@ class Camera {
   };
 
   /**
+   * Operating mode for the camera.
+   */
+  enum class CameraMode : uint8_t {
+      PHOTO = 0,
+      MOVIE = 1,
+  };
+
+  /**
    * GPS data type.
    */
   typedef struct _gps_t {
@@ -99,6 +107,16 @@ class Camera {
   virtual bool serialise(void *buffer, size_t bytes) const = 0;
 
   /**
+   * Change the camera operating mode (default implementation just caches).
+   */
+  virtual void setMode(CameraMode mode);
+
+  /**
+   * Query the current operating mode.
+   */
+  virtual Camera::CameraMode getMode(void) const;
+
+  /**
    * Checks if the client is still connected.
    */
   virtual bool isConnected(void) const;
@@ -146,6 +164,11 @@ class Camera {
   NimBLEClient *m_Client;
   std::string m_Name;
   bool m_Connected = false;
+
+  /**
+   * Current operating mode.
+   */
+  CameraMode m_Mode;
 
  private:
   const uint16_t m_MinInterval = BLE_GAP_INITIAL_CONN_ITVL_MIN;
