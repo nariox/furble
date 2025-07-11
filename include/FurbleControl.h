@@ -15,6 +15,8 @@ class Control {
     CMD_SHUTTER_RELEASE,
     CMD_FOCUS_PRESS,
     CMD_FOCUS_RELEASE,
+    CMD_MODE_PHOTO,
+    CMD_MODE_MOVIE,
     CMD_GPS_UPDATE,
     CMD_CONNECT,
     CMD_DISCONNECT,
@@ -121,6 +123,9 @@ class Control {
   /** Set transmit power. */
   void setPower(esp_power_level_t power);
 
+  /** Get Camera mode */
+  Camera::CameraMode getMode(void);
+
  private:
   Control() {};
 
@@ -135,6 +140,7 @@ class Control {
 
   bool m_InfiniteReconnect = false;
   state_t m_State = STATE_IDLE;
+  Camera::CameraMode m_Mode = Camera::CameraMode::PHOTO;
 
   // Camera connects are serialised, the following tracks the last attempt
   Camera *m_ConnectCamera = nullptr;

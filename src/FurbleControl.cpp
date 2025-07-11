@@ -60,6 +60,14 @@ void Control::Target::task(void) {
         ESP_LOGI(LOG_TAG, "focusRelease(%s)", name);
         m_Camera->focusRelease();
         break;
+      case CMD_MODE_PHOTO:
+        ESP_LOGI(LOG_TAG, "setMode(%s,PHOTO)", name);
+        m_Camera->setMode(Camera::CameraMode::PHOTO);
+        break;
+      case CMD_MODE_MOVIE:
+        ESP_LOGI(LOG_TAG, "setMode(%s,MOVIE)", name);
+        m_Camera->setMode(Camera::CameraMode::MOVIE);
+        break;
       case CMD_GPS_UPDATE:
         ESP_LOGI(LOG_TAG, "updateGeoData(%s)", name);
         m_Camera->updateGeoData(m_GPS, m_Timesync);
@@ -163,6 +171,14 @@ void Control::task(void) {
               case CMD_GPS_UPDATE:
                 target->sendCommand(cmd);
                 break;
+              case CMD_MODE_PHOTO:
+                m_Mode = Camera::CameraMode::PHOTO;
+                target->sendCommand(cmd);
+                break;
+              case CMD_MODE_MOVIE:
+                m_Mode = Camera::CameraMode::MOVIE;
+                target->sendCommand(cmd);
+                break;
               default:
                 ESP_LOGE(LOG_TAG, "Invalid control command %d.", cmd);
                 break;
@@ -258,6 +274,10 @@ Control::state_t Control::getState(void) {
 
 void Control::setPower(esp_power_level_t power) {
   m_Power = power;
+}
+
+Camera::CameraMode Control::getMode(void) {
+    return m_Mode;
 }
 
 };  // namespace Furble
