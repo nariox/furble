@@ -1892,6 +1892,49 @@ void UI::addSettingsMenu(void) {
   lv_menu_set_load_page_event(menu.main, menu.button, menu.page);
 }
 
+void UI::addModeMenu(const menu_t &parent) {
+  auto &control = Control::getInstance();
+  auto currentMode = control.getMode();
+
+  lv_obj_t *cont = lv_obj_create(parent.page);
+  lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
+  lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+  lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+  lv_obj_set_size(cont, LV_PCT(100), LV_SIZE_CONTENT);
+  lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLLABLE);
+
+  lv_obj_t *photo_cb = lv_checkbox_create(cont);
+  lv_checkbox_set_text(photo_cb, "Photo");
+  lv_obj_add_state(photo_cb, currentMode == Camera::CameraMode::PHOTO ? LV_STATE_CHECKED : 0);
+  lv_obj_set_user_data(photo_cb, reinterpret_cast<void *>(static_cast<intptr_t>(Camera::CameraMode::PHOTO)));
+
+  lv_obj_t *movie_cb = lv_checkbox_create(cont);
+  lv_checkbox_set_text(movie_cb, "Movie");
+  lv_obj_add_state(movie_cb, currentMode == Camera::CameraMode::MOVIE ? LV_STATE_CHECKED : 0);
+  lv_obj_set_user_data(movie_cb, reinterpret_cast<void *>(static_cast<intptr_t>(Camera::CameraMode::MOVIE)));
+
+  auto handler = [](lv_event_t *e) {
+    auto *cb = static_cast<lv_obj_t *>(lv_event_get_target(e));
+    auto *cont = static_cast<lv_obj_t *>(lv_obj_get_parent(cb));
+
+    uint32_t count = lv_obj_get_child_cnt(cont);
+    for (uint32_t i = 0; i < count; ++i) {
+      lv_obj_t *child = lv_obj_get_child(cont, i);
+      if (child != cb && lv_obj_check_type(child, &lv_checkbox_class)) {
+        lv_obj_clear_state(child, LV_STATE_CHECKED);
+      }
+    }
+
+    auto mode = static_cast<Camera::CameraMode>(reinterpret_cast<intptr_t>(lv_obj_get_user_data(cb)));
+    auto &control = Control::getInstance();
+    control.sendCommand(
+        mode == Camera::CameraMode::PHOTO ? Control::CMD_MODE_PHOTO : Control::CMD_MODE_MOVIE);
+  };
+
+  lv_obj_add_event_cb(photo_cb, handler, LV_EVENT_CLICKED, this);
+  lv_obj_add_event_cb(movie_cb, handler, LV_EVENT_CLICKED, this);
+}
+
 void UI::updateItems(const menu_t &menu) {
   auto *camera = CameraList::last();
 

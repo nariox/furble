@@ -313,6 +313,9 @@ class UI {
   /** Add the 'Settings' menu entry. */
   void addSettingsMenu(void);
 
+  /** Add the 'Camera Mode' menu entry. */
+  void addModeMenu(const menu_t &parent);
+
   /** Add 'Connected' menu. */
   menu_t &addConnectedMenu(void);
 
