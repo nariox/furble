@@ -147,6 +147,7 @@ class UI {
   static constexpr const char *m_ConnectedStr = "Connected";
   static constexpr const char *m_RemoteShutter = "Shutter";
   static constexpr const char *m_RemoteInterval = "Interval";
+  static constexpr const char *m_RemoteMode = "Mode";
   // dodgy hack, add a space so map key is unique
   static constexpr const char *m_IntervalometerRunStr = "Intervalometer ";
 

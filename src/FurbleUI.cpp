@@ -36,6 +36,7 @@ constexpr const char *UI::m_ScanStr;
 constexpr const char *UI::m_SettingsStr;
 constexpr const char *UI::m_IntervalometerStr;
 constexpr const char *UI::m_RemoteShutter;
+constexpr const char *UI::m_RemoteMode;
 constexpr const char *UI::m_IntervalometerRunStr;
 
 const uint32_t UI::m_KeyEnter;
@@ -84,6 +85,7 @@ std::unordered_map<const char *, UI::menu_t> UI::m_Menu = {
     {m_AboutStr,             {}},
     {m_RemoteShutter,        {}},
     {m_RemoteInterval,       {}},
+    {m_RemoteMode,           {}},
     {m_IntervalometerRunStr, {}},
 };
 
@@ -1168,6 +1170,11 @@ UI::menu_t &UI::addConnectedMenu(void) {
   menu_t &menuConnected = addMenu(m_ConnectedStr, NULL, false);
   menu_t &menuShutter = addMenu(m_RemoteShutter, LV_SYMBOL_IMAGE, true, menuConnected);
   menu_t &menuInterval = addMenu(m_RemoteInterval, LV_SYMBOL_LOOP, true, menuConnected);
+  ESP_LOGE("ui", "Made it here A");
+  menu_t &menuMode = addMenu(m_RemoteMode, LV_SYMBOL_SETTINGS, true, menuConnected);
+  ESP_LOGE("ui", "Made it here B");
+  addModeMenu(menuMode);
+  ESP_LOGE("ui", "Made it here C");
   lv_obj_t *disconnect = addMenuItem(menuConnected, LV_SYMBOL_CLOSE, "Disconnect");
 
   if (M5.Touch.isEnabled()) {
@@ -1896,27 +1903,32 @@ void UI::addModeMenu(const menu_t &parent) {
   auto &control = Control::getInstance();
   auto currentMode = control.getMode();
 
+  ESP_LOGE("ui", "Made it here 1");
   lv_obj_t *cont = lv_obj_create(parent.page);
   lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
   lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
   lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
   lv_obj_set_size(cont, LV_PCT(100), LV_SIZE_CONTENT);
   lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLLABLE);
+  ESP_LOGE("ui", "Made it here 2");
 
   lv_obj_t *photo_cb = lv_checkbox_create(cont);
   lv_checkbox_set_text(photo_cb, "Photo");
   lv_obj_add_state(photo_cb, currentMode == Camera::CameraMode::PHOTO ? LV_STATE_CHECKED : 0);
   lv_obj_set_user_data(photo_cb, reinterpret_cast<void *>(static_cast<intptr_t>(Camera::CameraMode::PHOTO)));
+  ESP_LOGE("ui", "Made it here 3");
 
   lv_obj_t *movie_cb = lv_checkbox_create(cont);
   lv_checkbox_set_text(movie_cb, "Movie");
   lv_obj_add_state(movie_cb, currentMode == Camera::CameraMode::MOVIE ? LV_STATE_CHECKED : 0);
   lv_obj_set_user_data(movie_cb, reinterpret_cast<void *>(static_cast<intptr_t>(Camera::CameraMode::MOVIE)));
+  ESP_LOGE("ui", "Made it here 4");
 
   auto handler = [](lv_event_t *e) {
     auto *cb = static_cast<lv_obj_t *>(lv_event_get_target(e));
     auto *cont = static_cast<lv_obj_t *>(lv_obj_get_parent(cb));
 
+  ESP_LOGE("ui", "Made it here 5");
     uint32_t count = lv_obj_get_child_cnt(cont);
     for (uint32_t i = 0; i < count; ++i) {
       lv_obj_t *child = lv_obj_get_child(cont, i);
@@ -1925,12 +1937,14 @@ void UI::addModeMenu(const menu_t &parent) {
       }
     }
 
+  ESP_LOGE("ui", "Made it here 6");
     auto mode = static_cast<Camera::CameraMode>(reinterpret_cast<intptr_t>(lv_obj_get_user_data(cb)));
     auto &control = Control::getInstance();
     control.sendCommand(
         mode == Camera::CameraMode::PHOTO ? Control::CMD_MODE_PHOTO : Control::CMD_MODE_MOVIE);
   };
 
+  ESP_LOGE("ui", "Made it here 7");
   lv_obj_add_event_cb(photo_cb, handler, LV_EVENT_CLICKED, this);
   lv_obj_add_event_cb(movie_cb, handler, LV_EVENT_CLICKED, this);
 }
