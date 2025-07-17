@@ -1018,6 +1018,15 @@ void UI::showShutterIntervalometer(bool show) {
   }
 }
 
+void UI::showShutterMode(bool show) {
+  if (show) {
+    lv_obj_clear_flag(m_ModeStart, LV_OBJ_FLAG_HIDDEN);
+    lv_group_focus_obj(m_ModeStart);
+  } else {
+    lv_obj_add_flag(m_ModeStart, LV_OBJ_FLAG_HIDDEN);
+  }
+}
+
 void UI::connectTimerHandler(lv_timer_t *timer) {
   auto *ctx = static_cast<ConnectContext_t *>(lv_timer_get_user_data(timer));
   auto &control = Control::getInstance();
@@ -1173,7 +1182,6 @@ UI::menu_t &UI::addConnectedMenu(void) {
   ESP_LOGE("ui", "Made it here A");
   menu_t &menuMode = addMenu(m_RemoteMode, LV_SYMBOL_SETTINGS, true, menuConnected);
   ESP_LOGE("ui", "Made it here B");
-  addModeMenu(menuMode);
   ESP_LOGE("ui", "Made it here C");
   lv_obj_t *disconnect = addMenuItem(menuConnected, LV_SYMBOL_CLOSE, "Disconnect");
 
@@ -1250,7 +1258,6 @@ UI::menu_t &UI::addConnectedMenu(void) {
   menu_t &menuIntervalometer = m_Menu.at(m_IntervalometerStr);
   lv_menu_set_load_page_event(menuIntervalometer.main, menuInterval.button,
                               menuIntervalometer.page);
-
   lv_obj_add_event_cb(
       menuInterval.button,
       [](lv_event_t *e) {
@@ -1258,6 +1265,20 @@ UI::menu_t &UI::addConnectedMenu(void) {
         ui->showShutterIntervalometer(true);
       },
       LV_EVENT_CLICKED, this);
+
+  // add intervalometer control
+  menu_t &menuMode = m_Menu.at(m_ModeStr);
+  lv_menu_set_load_page_event(menuMode.main, menuMode.button,
+                              menuMode.page);
+
+  lv_obj_add_event_cb(
+      menuMode.button,
+      [](lv_event_t *e) {
+        auto *ui = static_cast<UI *>(lv_event_get_user_data(e));
+        ui->showShutterMode(true);
+      },
+      LV_EVENT_CLICKED, this);
+
 
   // add disconnect control
   lv_obj_add_event_cb(
@@ -1892,6 +1913,7 @@ void UI::addSettingsMenu(void) {
   addFeaturesMenu(menu);
   addGPSMenu(menu);
   addIntervalometerMenu(menu);
+  addModeMenu(menu);
   addThemeMenu(menu);
   addTransmitPowerMenu(menu);
   addAboutMenu(menu);
@@ -1903,6 +1925,7 @@ void UI::addModeMenu(const menu_t &parent) {
   auto &control = Control::getInstance();
   auto currentMode = control.getMode();
 
+  ESP_LOGE("ui", "Made it here 1");
   ESP_LOGE("ui", "Made it here 1");
   lv_obj_t *cont = lv_obj_create(parent.page);
   lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
